@@ -1,0 +1,15 @@
+@echo off
+
+:START
+
+ping -n 4 4.2.2.2 -w 20000 >nul
+
+if %errorlevel% == 1 (
+  echo Internet offline >> C:\Internet.txt
+  Time /t >> C:\Internet.txt
+)
+
+Timeout /t 30
+@set errorlevel = 0
+
+GOTO START
