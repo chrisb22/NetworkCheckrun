@@ -1,4 +1,6 @@
 @echo off
+
+:START
 ECHO Checking connection, please wait...
 PING -n 1 www.google.com|find "Reply from " >NUL
 IF NOT ERRORLEVEL 1 goto :SUCCESS
@@ -30,30 +32,45 @@ IF     ERRORLEVEL 1 goto :NETDOWN
 
 :ROUTERSUCCESS
 ECHO It appears that you can reach the router, but internet is unreachable.
+(
+  echo Internet offline but connnected to router >> C:\Internet.txt
+  Time /t >> C:\Internet.txt
+)
 goto :FAILURE
 
 :NETDOWN
 ECHO FAILURE!
 ECHO It appears that you having network issues, the router cannot be reached.
+(
+  echo Internet offline >> C:\Internet.txt
+  Time /t >> C:\Internet.txt
+)
 goto :FAILURE
 
 :SUCCESSDNS
 ECHO It appears that you are having DNS issues.
+(
+  echo Internet is having DNS issues >> C:\Internet.txt
+  Time /t >> C:\Internet.txt
+)
 goto :FAILURE
 
 :SUCCESS
 ECHO You have an active Internet connection
 pause
-goto END
+goto :RESTART
 
 :SUCCESS2
 ECHO You have an active internet connection but some packet loss was detected.
 pause
-goto :END
+goto :RESTART
 
 :FAILURE
 ECHO You do not have an active Internet connection
 pause
-goto :END
+goto :RESTART
 
-:END
+:RESTART
+Timeout /t 90
+@set errorlevel = 0
+GOTO START
